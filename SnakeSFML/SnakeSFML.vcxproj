@@ -151,7 +151,7 @@
     <ClCompile Include="GameMap.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Snake.cpp" />
-    <ClCompile Include="Test.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bonus.h" />

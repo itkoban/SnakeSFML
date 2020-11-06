@@ -43,7 +43,7 @@ Menu::Menu(sf::RenderWindow & window) {
 	rateTextureActive.loadFromFile("images/Menu/rate_active.png");
 	rateButton.setTexture(rateTexturePassive);
 	rateButton.setScale(scale_x, scale_y);
-	rateButton.setPosition(window.getSize().x / 2 - scale_x * rateTexturePassive.getSize().x / 2, window.getSize().y / 2);//+ scale_y * rateTexturePassive.getSize().y / 2);
+	rateButton.setPosition(window.getSize().x / 2 - scale_x * rateTexturePassive.getSize().x / 2, window.getSize().y / 2);
 
 
 	settingsTexturePassive.loadFromFile("images/Menu/settings.png");

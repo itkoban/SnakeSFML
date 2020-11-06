@@ -23,8 +23,9 @@ private:
 	Texture box_orange;
 	Texture box_yellow;
 
+	Texture heart;
+
 	Font font;
-	//.loadFromFile("Calibri.ttf");
 
 	char map[25][14];
 	std::vector<Bonus> letters;
@@ -42,8 +43,6 @@ private:
 
 	bool checkLetter(int x, int y);
 
-	void updateSprites(); //Обновляет спрайты букв и боунсов, когда нужно
-
 public:
 
 	void init(Dictionary* dictionary, Snake* snake, float scale_X, float scale_Y,	float d_X, float d_Y);
@@ -58,7 +57,7 @@ public:
 
 	std::string getWord();
 
-	void restart();
+	void restart(Dictionary* dictionary, Snake* snake);
 
 };
 

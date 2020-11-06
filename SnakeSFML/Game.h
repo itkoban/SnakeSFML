@@ -38,6 +38,12 @@ private:
 	std::vector<Texture> word_textures;
 	std::string word;
 
+	Texture heart_texture;
+	Sprite heart_sprite;
+
+	Texture heart_live_texture;
+	Sprite heart_live_sprite;
+
 	bool is_stop;
 	bool is_pause;
 
@@ -54,6 +60,12 @@ private:
 	void updateScore();
 
 	void initScore();
+
+	void drawHearts(RenderWindow& window);
+
+	void initHearts();
+
+	void endGame();
 
 public:
 
@@ -75,9 +87,11 @@ public:
 
 	void addScore(int points);
 
-	void gameOver();
-
 	void draw(RenderWindow& window);
+	
+	bool isGameOver();
+
+	int getScore();
 
 	void restart();
 

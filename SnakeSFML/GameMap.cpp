@@ -1,5 +1,10 @@
 #include "GameMap.h"
 
+/*
+-----------------
+PRIVATE Functions
+-----------------
+*/
 
 bool GameMap::checkLetter(int x, int y)
 {
@@ -19,41 +24,9 @@ bool GameMap::checkLetter(int x, int y)
 }
 
 /*
-void GameMap::updateSprites()
-{
-	for (int i = 0; i < letters.size(); i++)
-	{
-		int box = rand() % 4;
-
-		switch (box)
-		{
-			case 0:
-			{
-				letters.at(i).setSpriteTexture(box_blue);
-				break;
-			}
-			
-			case 1:
-			{
-				letters.at(i).setSpriteTexture(box_green);
-				break;
-			}
-			
-			case 2:
-			{
-				letters.at(i).setSpriteTexture(box_orange);
-				break;
-			}
-			
-			case 3:
-			{
-				letters.at(i).setSpriteTexture(box_yellow);
-				break;
-			}
-		}
-	}
-	
-}
+----------------
+PUBLIC Functions
+----------------
 */
 
 void GameMap::init(Dictionary* dictionary, Snake* snake, float scale_X, float scale_Y, float d_X, float d_Y)
@@ -67,7 +40,8 @@ void GameMap::init(Dictionary* dictionary, Snake* snake, float scale_X, float sc
 	//Загрузка шрифта
 	std::cout << "FONT: " << font.loadFromFile("Calibri.ttf") << std::endl;
 	
-	
+	heart.loadFromFile("images/HUD/heart_on.png");
+
 
 	scale_x = scale_X;
 	scale_y = scale_Y;
@@ -145,7 +119,6 @@ void GameMap::init(Dictionary* dictionary, Snake* snake, float scale_X, float sc
 	{
 		std::cout << letters.at(i).getType() << std::endl;
 	}
-	//updateSprites();
 	
 }
 
@@ -300,6 +273,17 @@ void GameMap::updateMap(Dictionary* dictionary, Snake* snake)
 		}
 		//updateSprites();
 	}
+
+	int heart_is = rand() % 1000;
+	if (heart_is < 5) {
+		int heart_x = rand() % 25;
+		int heart_y = rand() % 14;
+		if (map[heart_x][heart_y] == ' ')
+		{
+			map[heart_x][heart_y] = '+';
+		}
+	}
+
 	std::cout << word;
 	std::cout << "##############" << std::endl;
 	for (int x = 0; x < 25; x++) {
@@ -324,6 +308,18 @@ void GameMap::updateMap(Dictionary* dictionary, Snake* snake)
 
 void GameMap::drawMap(RenderWindow& window)
 {
+	for (int x = 0; x < 25; x++) {
+		for (int y = 0; y < 14; y++) {
+			if (map[x][y] == '+')
+			{
+				Sprite heart_sprite;
+				heart_sprite.setScale(0.72725f, 0.71075f);
+				heart_sprite.setTexture(heart);
+				heart_sprite.setPosition((x + 4) * dX, (y + 2) * dY);
+				window.draw(heart_sprite);
+			}
+		}
+	}
 	for (int i = letters.size() - 1; i >= 0; i--)
 	{
 		letters.at(i).drawCell(window);
@@ -335,4 +331,77 @@ void GameMap::drawMap(RenderWindow& window)
 std::string GameMap::getWord()
 {
 	return word;
+}
+
+void GameMap::restart(Dictionary* dictionary, Snake* snake)
+{
+	//Устанавливаем новое положенгие змейки
+	for (int i = 0; i < snake->getLength(); i++) {
+		map[snake->getBody(i).x][snake->getBody(i).y] = '~';
+	}
+	word = dictionary->getRandWord();
+	cur_letter = 0;
+
+	//Обновляем карту новыми буквами
+	int counter = word.length() - 1;
+	int loop = 0;
+
+	letters.clear();
+	//boxSprites = new Sprite[word.length()];
+	while (counter >= 0)
+	{
+		int box = rand() % 4;
+		BOX_COLOR color;
+
+		switch (box)
+		{
+		case 0:
+		{
+			color = BOX_COLOR::BLUE;
+			break;
+		}
+
+		case 1:
+		{
+			color = BOX_COLOR::GREEN;
+			break;
+		}
+
+		case 2:
+		{
+			color = BOX_COLOR::ORANGE;
+			break;
+		}
+
+		case 3:
+		{
+			color = BOX_COLOR::YELLOW;
+			break;
+		}
+		}
+
+		int letter_x = rand() % 25;
+		int letter_y = rand() % 14;
+		if (map[letter_x][letter_y] == ' ')
+		{
+
+			map[letter_x][letter_y] = word.at(counter);
+			Bonus bon(word.at(counter), letter_x, letter_y, color);
+			letters.push_back(bon);
+			counter--;
+		}
+		//Если места не нашлось поставить букву, то выходим из цикла
+		if (loop < 50)
+		{
+			loop++;
+		}
+		else
+		{
+			counter = -1;
+		}
+	}
+	for (int i = 0; i < letters.size(); i++)
+	{
+		std::cout << letters.at(i).getType() << std::endl;
+	}
 }
