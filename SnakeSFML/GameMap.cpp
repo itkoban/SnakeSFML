@@ -23,6 +23,21 @@ bool GameMap::checkLetter(int x, int y)
 	}
 }
 
+bool GameMap::checkHead(Snake* snake, int x, int y)
+{
+	int snake_head_x = snake->getBody(0).x;
+	int snake_head_y = snake->getBody(0).y;
+
+	if (snake_head_x == x - 1 || snake_head_x == x + 1 || snake_head_x == x)
+	{
+		if (snake_head_y == y - 1 || snake_head_y == y + 1 || snake_head_y == y)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 /*
 ----------------
 PUBLIC Functions
@@ -97,9 +112,8 @@ void GameMap::init(Dictionary* dictionary, Snake* snake, float scale_X, float sc
 
 		int letter_x = rand() % 25;
 		int letter_y = rand() % 14;
-		if (map[letter_x][letter_y] == ' ')
+		if (map[letter_x][letter_y] == ' ' && !checkHead(snake, letter_x, letter_y))
 		{
-			
 			map[letter_x][letter_y] = word.at(counter);
 			Bonus bon(word.at(counter), letter_x, letter_y, color);
 			letters.push_back(bon);
@@ -175,11 +189,12 @@ bool GameMap::checkMap(Snake* snake)
 	//Иначе убираем жизнь и обнуляем слово
 	else
 	{
-		if (snake->getHealth() == 1) {
+		
+		snake->minusHealth();
+		if (snake->getHealth() == 0) {
 			score = 0;
 			over = true;
 		}
-		snake->minusHealth();
 		map[snake_head_x][snake_head_y] = ' ';
 		letters.clear();
 		
@@ -254,7 +269,7 @@ void GameMap::updateMap(Dictionary* dictionary, Snake* snake)
 
 			int letter_x = rand() % 25;
 			int letter_y = rand() % 14;
-			if (map[letter_x][letter_y] == ' ')
+			if (map[letter_x][letter_y] == ' ' && !checkHead(snake, letter_x, letter_y))
 			{
 				map[letter_x][letter_y] = word.at(counter);
 				Bonus bon(word.at(counter), letter_x, letter_y, color);
@@ -271,7 +286,6 @@ void GameMap::updateMap(Dictionary* dictionary, Snake* snake)
 				counter = -1;
 			}
 		}
-		//updateSprites();
 	}
 
 	int heart_is = rand() % 1000;
@@ -286,8 +300,9 @@ void GameMap::updateMap(Dictionary* dictionary, Snake* snake)
 
 	std::cout << word;
 	std::cout << "##############" << std::endl;
-	for (int x = 0; x < 25; x++) {
-		for (int y = 0; y < 14; y++) {
+	
+	for (int y = 0; y < 14; y++) {
+		for (int x = 0; x < 25; x++) {
 			if (map[x][y] == ' ')
 			{
 				std::cout << '.';
@@ -299,6 +314,7 @@ void GameMap::updateMap(Dictionary* dictionary, Snake* snake)
 		}
 		std::cout << std::endl;
 	}
+
 	std::cout << "##############" << std::endl;
 	//Добавить генерацию сердечек
 	
@@ -323,8 +339,6 @@ void GameMap::drawMap(RenderWindow& window)
 	for (int i = letters.size() - 1; i >= 0; i--)
 	{
 		letters.at(i).drawCell(window);
-		//window.draw(letters.at(i).getBoxSprite());
-		//window.draw(letters.at(i).getLetterSprite());
 	}
 }
 
@@ -335,6 +349,13 @@ std::string GameMap::getWord()
 
 void GameMap::restart(Dictionary* dictionary, Snake* snake)
 {
+	//Очищаем карту от предудущего состояния букв
+	for (int x = 0; x < 25; x++) {
+		for (int y = 0; y < 14; y++) {
+			map[x][y] = ' ';
+		}
+	}
+	letters.clear();
 	//Устанавливаем новое положенгие змейки
 	for (int i = 0; i < snake->getLength(); i++) {
 		map[snake->getBody(i).x][snake->getBody(i).y] = '~';
@@ -346,7 +367,7 @@ void GameMap::restart(Dictionary* dictionary, Snake* snake)
 	int counter = word.length() - 1;
 	int loop = 0;
 
-	letters.clear();
+	
 	//boxSprites = new Sprite[word.length()];
 	while (counter >= 0)
 	{

@@ -1,6 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+enum class MENU_STATE
+{
+	CLOSE, SETTINGS, RATING, GAME, NONE
+};
+
 //—делать класс  Ќќѕ »
 class Menu
 {
@@ -10,9 +15,11 @@ private:
 	float scale_x;
 	float scale_y;
 
+	bool active;
+
 	int menuNum;
 
-	bool is_menu;
+	MENU_STATE menu_state;
 
 	//‘он
 	sf::Texture backTexture;
@@ -45,9 +52,15 @@ public:
 
 	void events(sf::RenderWindow & window);
 
-	bool isMenu();
+	void setState(MENU_STATE state);
 
-	void goMenu(bool isMenu);
+	void disable();
+
+	void activate();
+
+	bool isActive();
+
+	MENU_STATE getState();
 
 };
 

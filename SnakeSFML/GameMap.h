@@ -43,6 +43,8 @@ private:
 
 	bool checkLetter(int x, int y);
 
+	bool checkHead(Snake* snake, int x, int y);
+
 public:
 
 	void init(Dictionary* dictionary, Snake* snake, float scale_X, float scale_Y,	float d_X, float d_Y);

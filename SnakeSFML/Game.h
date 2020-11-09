@@ -4,9 +4,14 @@
 #include "Snake.h"
 #include "Dictionary.h"
 #include "GameMap.h"
+#include "GameMenu.h"
 
 using namespace sf;
 
+enum class GAME_STATE
+{
+	PLAY, PAUSE, RESULT, MENU
+};
 
 class Game
 {
@@ -25,11 +30,10 @@ private:
 
 	GameMap game_map;
 
-	int key_time;
-
 	Clock clock;
 	float timer = 0, delay = 0.14;
 
+	bool alive;
 
 	Texture field_texture;
 	Sprite field_sprite;
@@ -44,12 +48,11 @@ private:
 	Texture heart_live_texture;
 	Sprite heart_live_sprite;
 
-	bool is_stop;
-	bool is_pause;
-
 	Snake snake;
 
 	Dictionary dictionary;
+	
+	GAME_STATE game_state;
 
 	void drawWord(RenderWindow& window);
 
@@ -69,19 +72,15 @@ private:
 
 public:
 
-	Game();
+	Game(RenderWindow& window);
 
-	void Tick();
+	void Tick(RenderWindow& window);
 
 	void input(Keyboard::Key key);
 
-	void pause(bool pause);
+	void setGameState(GAME_STATE state);
 
-	void stop(bool stop);
-
-	bool isStop(); //Возвращает состояние - Остановлена игра или нет
-
-	bool isPause();
+	GAME_STATE getGameState();
 
 	bool initDictionary();
 

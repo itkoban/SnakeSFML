@@ -155,9 +155,8 @@ void Game::initHearts()
 
 void Game::endGame()
 {
-	is_stop = true;
-	snake.retry();
-	//resrart
+	game_state = GAME_STATE::RESULT;
+	alive = false;
 }
 
 /*
@@ -166,22 +165,17 @@ PUBLIC Functions
 ----------------
 */
 
-Game::Game()
+Game::Game(RenderWindow& window)
 {	
-	key_time = 6;
-
-	snake;
+	game_state = GAME_STATE::MENU;
 	
 	dX = 58.18f;
 	dY = 56.84f;
 	
+	alive = true;
+
 	scale_x = 0.29f;
 	scale_y = 0.2842f;
-
-	game_map;
-
-	is_stop = true;
-	is_pause = false;
 
 	std::cout << "FIELD" << field_texture.loadFromFile("images/Snake/field.png") << std::endl;
 	field_sprite.setTexture(field_texture);
@@ -199,35 +193,30 @@ Game::Game()
 }
 
 
-void Game::Tick() 
+void Game::Tick(RenderWindow& window)
 {
 	float time = clock.getElapsedTime().asSeconds();
 	clock.restart();
 	timer += time;
-	key_time++;
-	if (!is_pause && key_time >= 5) {
-		
-		key_time = 0;
-		
-		
-	}
-	
-	if (timer > delay) {
+
+	if (timer > delay)
+	{
 		timer = 0;
-		if (!is_pause) {
-			snake.go();
-			
-			if (game_map.checkMap(&snake))
-			{
-				endGame();
-			}
+
+		snake.go();
+
+		if (game_map.checkMap(&snake))
+		{
+			endGame();
+		}
+		else
+		{
 			game_map.updateMap(&dictionary, &snake);
 			updateScore();
 		}
-	}
-	
-	
 		
+	}
+
 }
 
 void Game::input(Keyboard::Key key)
@@ -259,23 +248,14 @@ void Game::input(Keyboard::Key key)
 	
 }
 
-void Game::pause(bool pause) 
+void Game::setGameState(GAME_STATE state)
 {
-	is_pause = pause;
+	game_state = state;
 }
 
-void Game::stop(bool stop) {
-	is_stop = stop;
-}
-
-bool Game::isStop() //Возвращает состояние - пауза или нет
+GAME_STATE Game::getGameState()
 {
-	return is_stop;
-}
-
-bool Game::isPause()
-{
-	return is_pause;
+	return game_state;
 }
 
 bool Game::initDictionary() 
@@ -287,19 +267,22 @@ void Game::draw(RenderWindow& window)
 {
 	//Отрисовка фона
 	window.draw(field_sprite);
-
+	
+	for (int i = 0; i < snake.getLength(); i++) {
+		snake.updateTexture(i);
+	}
 	//Отрисовка змейки
 	snake.drawSnake(window);
 
 	//Отрисовка бонусов
 	game_map.drawMap(window);
-		
+
 
 	Font font;
 	font.loadFromFile("Calibri.ttf");
-	std::ostringstream len, heal, sc;    
+	std::ostringstream len, heal, sc;
 	len << snake.getLength();
-	heal << snake.getHealth();	
+	heal << snake.getHealth();
 	sc << game_map.getScore();
 
 	std::string snake_len("Snake is " + len.str());
@@ -333,14 +316,7 @@ void Game::draw(RenderWindow& window)
 
 bool Game::isGameOver()
 {
-	if (!snake.isAlive())
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return !alive;
 }
 
 int Game::getScore()
@@ -350,6 +326,7 @@ int Game::getScore()
 
 void Game::restart()
 {
+	alive = true;
 	snake.retry();
 	game_map.restart(&dictionary, &snake);
 }

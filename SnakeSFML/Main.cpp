@@ -16,9 +16,11 @@ int main()
 
     window.setFramerateLimit(60);
 
+    GameMenu game_menu(window);
+
     Menu menu(window);
 
-    Game game;
+    Game game(window);
 
     Dictionary dic;
 
@@ -47,27 +49,29 @@ int main()
                 if (Keyboard::isKeyPressed(Keyboard::Escape))
                 {
 
-                    if (menu.isMenu()) {
+                    if (game.getGameState() == GAME_STATE::PLAY || game.getGameState() == GAME_STATE::PAUSE)
+                    {
 
-                        game.stop(false);
-                        menu.goMenu(false);
+                        game.setGameState(GAME_STATE::MENU);
+        
                     }
-                    else {
-                        game.stop(true);
-                        menu.goMenu(true);
-                    }
+
                 }
 
                 if (Keyboard::isKeyPressed(Keyboard::Space))
                 {
 
-                    if (game.isPause()) 
+                    if (game.getGameState() == GAME_STATE::PLAY)
                     {
-                        game.pause(false);
+
+                        game.setGameState(GAME_STATE::PAUSE);
+
                     }
-                    else 
+                    else if (game.getGameState() == GAME_STATE::PAUSE)
                     {
-                        game.pause(true);
+
+                        game.setGameState(GAME_STATE::PLAY);
+
                     }
                 }
                 
@@ -77,55 +81,124 @@ int main()
 
             if (e.type == Event::KeyReleased)
             {
-                if (e.key.code == Keyboard::Left)
+                if (game.getGameState() == GAME_STATE::PLAY)
                 {
-                    if (!game.isPause())
+                    if (e.key.code == Keyboard::Left)
                     {
                         game.input(Keyboard::Left);
                     }
-                }
-                
-                if (e.key.code == Keyboard::Right)
-                {
-                    if (!game.isPause())
+
+                    else if (e.key.code == Keyboard::Right)
                     {
                         game.input(Keyboard::Right);
                     }
-                }
-                
-                if (e.key.code == Keyboard::Up)
-                {
-                    if (!game.isPause())
+
+                    else if (e.key.code == Keyboard::Up)
                     {
                         game.input(Keyboard::Up);
                     }
-                }
-                
-                if (e.key.code == Keyboard::Down)
-                {
-                    if (!game.isPause())
+
+                    else if (e.key.code == Keyboard::Down)
                     {
                         game.input(Keyboard::Down);
                     }
+
+                    else if (e.key.code == Keyboard::Escape)
+                    {
+                        game.setGameState(GAME_STATE::MENU);
+                    }
+                    
+                }  
+                if (game.getGameState() == GAME_STATE::PAUSE)
+                {
+                    if (e.key.code == Keyboard::Escape)
+                    {
+                        game.setGameState(GAME_STATE::MENU);
+                    }
                 }
             }
-
         }
         
         
         window.clear(Color::White);
-        if (menu.isMenu()) {
+        if (game.getGameState() == GAME_STATE::MENU) {
             
             menu.draw(window);
-            menu.events(window);
-            if (!menu.isMenu()) game.stop(false);
+           
+            if (!menu.isActive())
+            {
+                menu.activate();
+            }
+            else
+            {
+                menu.events(window);
+
+                switch (menu.getState())
+                {
+                case MENU_STATE::GAME:
+                {
+                    game.setGameState(GAME_STATE::PLAY);
+                    menu.setState(MENU_STATE::NONE);
+                    break;
+                }
+
+                case MENU_STATE::CLOSE:
+                {
+                    window.close();
+                    break;
+                }
+
+                case MENU_STATE::NONE:
+                {
+
+                }
+
+                }
+            }
         }
-        else if (!game.isStop()) {
-            game.Tick();
+        else if (game.getGameState() == GAME_STATE::PLAY) {
+            game.Tick(window);
             game.draw(window);
         }
-        else {
-            menu.goMenu(true);
+        else if (game.getGameState() == GAME_STATE::PAUSE) {
+            game.draw(window);
+        }
+        else if (game.getGameState() == GAME_STATE::RESULT) {
+            game_menu.draw(window);
+            switch (game_menu.events(window))
+            {
+                
+                case COMMAND::BACK:
+                {
+                    if (!game.isGameOver())
+                    {
+                        game.setGameState(GAME_STATE::PLAY);
+                    }
+                    break;
+                }
+
+                case COMMAND::MENU:
+                {
+                    game.restart();
+                    game.setGameState(GAME_STATE::MENU);
+                    menu.setState(MENU_STATE::NONE);
+                    menu.disable();
+                    break;
+                }
+
+                case COMMAND::RETRY:
+                {
+                    game.restart();
+                    game.setGameState(GAME_STATE::PLAY);
+                    break;
+                }
+
+                case COMMAND::NONE:
+                {
+
+                }
+
+            }
         }
         window.display();
     }

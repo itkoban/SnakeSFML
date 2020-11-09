@@ -18,7 +18,7 @@ private:
 
 	Body* body; //Тело
 	unsigned int length; //Длина тела
-	int health; //Жизни, пока не реализовано, ВООБЩЕ
+	int health; //Жизни
 	
 	//Размер поля в спрайтах
 	int size_x; 

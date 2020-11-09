@@ -25,7 +25,9 @@ Menu::Menu(sf::RenderWindow & window) {
 
 	menuNum = 0;
 
-	is_menu = true;
+	active = true;
+
+	menu_state = MENU_STATE::NONE;
 
 	backTexture.loadFromFile("images/Menu/back.png");
 	backSprite.setTexture(backTexture);
@@ -73,74 +75,95 @@ void Menu::draw(sf::RenderWindow& window) {
 //—‰ÂÎ‡Ú¸ ÍÎ‡ÒÒ  ÕŒœ »
 void Menu::events(sf::RenderWindow & window) {
 	
-	int mouse_x = sf::Mouse::getPosition(window).x;
-	int mouse_y = sf::Mouse::getPosition(window).y;
+	if (active)
+	{
+		int mouse_x = sf::Mouse::getPosition(window).x;
+		int mouse_y = sf::Mouse::getPosition(window).y;
 
-	menuNum = 0;
-	//PLAY
-	if (containsSprite(playButton, mouse_x, mouse_y)) {
-		playButton.setTexture(playTextureActive);
-		menuNum = 1;
-	}
-	else {
-		playButton.setTexture(playTexturePassive);
-	}
-	
-	//RATE
-	if (containsSprite(rateButton, mouse_x, mouse_y)) {
-		rateButton.setTexture(rateTextureActive);
-		menuNum = 2;
-	}
-	else {
-		rateButton.setTexture(rateTexturePassive);
-	}
-	
-	//SETTINGS
-	if (containsSprite(settingsButton, mouse_x, mouse_y)) {
-		settingsButton.setTexture(settingsTextureActive);
-		menuNum = 3;
-	}
-	else {
-		settingsButton.setTexture(settingsTexturePassive);
-	}
-
-	//CLOSE
-	if (containsSprite(closeButton, mouse_x, mouse_y)) {
-		closeButton.setTexture(closeTextureActive);
-		menuNum = 4;
-	}
-	else {
-		closeButton.setTexture(closeTexturePassive);
-	}
-	
-	
-
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-		switch (menuNum)
-		{
-
-		case 1: {
-			is_menu = false;
-			break;
+		menuNum = 0;
+		//PLAY
+		if (containsSprite(playButton, mouse_x, mouse_y)) {
+			playButton.setTexture(playTextureActive);
+			menuNum = 1;
+		}
+		else {
+			playButton.setTexture(playTexturePassive);
 		}
 
-		case 4: {
-			window.close();
-			break;
+		//RATE
+		if (containsSprite(rateButton, mouse_x, mouse_y)) {
+			rateButton.setTexture(rateTextureActive);
+			menuNum = 2;
+		}
+		else {
+			rateButton.setTexture(rateTexturePassive);
 		}
 
-		default:
-			break;
+		//SETTINGS
+		if (containsSprite(settingsButton, mouse_x, mouse_y)) {
+			settingsButton.setTexture(settingsTextureActive);
+			menuNum = 3;
+		}
+		else {
+			settingsButton.setTexture(settingsTexturePassive);
+		}
+
+		//CLOSE
+		if (containsSprite(closeButton, mouse_x, mouse_y)) {
+			closeButton.setTexture(closeTextureActive);
+			menuNum = 4;
+		}
+		else {
+			closeButton.setTexture(closeTexturePassive);
+		}
+
+
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+			switch (menuNum)
+			{
+
+			case 1: {
+				menu_state = MENU_STATE::GAME;
+				break;
+			}
+
+			case 4: {
+				menu_state = MENU_STATE::CLOSE;
+				break;
+			}
+
+			default:
+				menu_state = MENU_STATE::NONE;
+				break;
+			}
 		}
 	}
 
-
+	
 }
 
-bool Menu::isMenu() {
-	return is_menu;
+void Menu::disable()
+{
+	active = false;
 }
 
-void Menu::goMenu(bool isMenu) {
-	is_menu = isMenu;
+void Menu::activate()
+{
+	active = true;
+}
+
+bool Menu::isActive()
+{
+	return active;
+}
+
+void Menu::setState(MENU_STATE state)
+{
+	menu_state = state;
+}
+
+MENU_STATE Menu::getState()
+{
+	return menu_state;
 }

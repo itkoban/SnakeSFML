@@ -20,7 +20,7 @@ Snake::Snake() {
 	size_x = 25;
 	size_y = 14;
 		
-	health = 3;
+	health = 4;
 	for (int i = 0; i < 100; i++)
 	{
 		body[i].sprite.setScale(0.29f, 0.2842f);
@@ -120,9 +120,7 @@ void Snake::go() {
 	}
 
 	//Обновляем текстуры змейки
-	for (int i = 0; i < length; i++) {
-		updateTexture(i);
-	}
+	
 }
 
 
@@ -172,11 +170,6 @@ void Snake::addHelth()
 void Snake::minusHealth()
 {
 	health--;
-	if (health == 0)
-	{
-		health = 3;
-		retry();
-	}
 }
 
 int Snake::getHealth()
