@@ -58,7 +58,7 @@ Menu::Menu(sf::RenderWindow & window) {
 	closeTextureActive.loadFromFile("images/Menu/close_active.png");
 	closeButton.setTexture(closeTexturePassive);
 	closeButton.setScale(scale_x, scale_y);
-	closeButton.setPosition(window.getSize().x / 2 - scale_x * closeTexturePassive.getSize().x / 2, window.getSize().y / 2 + window.getSize().y / 4 - scale_y * closeTexturePassive.getSize().y / 2);
+	closeButton.setPosition(window.getSize().x / 2 - scale_x * closeTexturePassive.getSize().x / 2, window.getSize().y / 2 + window.getSize().y / 4 + scale_y * closeTexturePassive.getSize().y / 2);
 }
 
 void Menu::draw(sf::RenderWindow& window) {

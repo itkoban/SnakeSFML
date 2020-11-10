@@ -1,10 +1,15 @@
 #pragma once
 
+#include <Math.h>
+#include <iostream>
+#include <sstream>
+
 #include <SFML\Graphics.hpp>
+
 #include "Snake.h"
 #include "Dictionary.h"
 #include "GameMap.h"
-#include "GameMenu.h"
+
 
 using namespace sf;
 

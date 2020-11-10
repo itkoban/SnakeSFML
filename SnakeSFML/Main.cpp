@@ -1,10 +1,13 @@
 #include <SFML/Graphics.hpp>
+
 #include <iostream>
 #include <time.h>
+
 #include "Snake.h"
 #include "Menu.h"
 #include "Game.h"
 #include "Dictionary.h"
+#include "GameMenu.h"
 
 using namespace sf;
 
@@ -16,11 +19,11 @@ int main()
 
     window.setFramerateLimit(60);
 
-    GameMenu game_menu(window);
-
     Menu menu(window);
 
     Game game(window);
+
+    GameMenu game_menu(window, &game);
 
     Dictionary dic;
 
@@ -30,7 +33,7 @@ int main()
     dic.init("dictionaries/Dictionary.txt");
     dic.initWords();
     
-    
+    bool block_input = false;
 
     
 
@@ -45,18 +48,6 @@ int main()
 
             if (e.type == Event::KeyPressed) {
                 
-
-                if (Keyboard::isKeyPressed(Keyboard::Escape))
-                {
-
-                    if (game.getGameState() == GAME_STATE::PLAY || game.getGameState() == GAME_STATE::PAUSE)
-                    {
-
-                        game.setGameState(GAME_STATE::MENU);
-        
-                    }
-
-                }
 
                 if (Keyboard::isKeyPressed(Keyboard::Space))
                 {
@@ -81,7 +72,23 @@ int main()
 
             if (e.type == Event::KeyReleased)
             {
-                if (game.getGameState() == GAME_STATE::PLAY)
+                
+                if (e.key.code == Keyboard::Escape)
+                {
+                    if (game.getGameState() == GAME_STATE::PLAY || game.getGameState() == GAME_STATE::PAUSE)
+                    {
+
+                        game.setGameState(GAME_STATE::RESULT);
+
+                    }
+                    else if (game.getGameState() == GAME_STATE::RESULT && !game.isGameOver())
+                    {
+
+                        game.setGameState(GAME_STATE::PLAY);
+
+                    }
+                }
+                else if (game.getGameState() == GAME_STATE::PLAY)
                 {
                     if (e.key.code == Keyboard::Left)
                     {
@@ -102,19 +109,6 @@ int main()
                     {
                         game.input(Keyboard::Down);
                     }
-
-                    else if (e.key.code == Keyboard::Escape)
-                    {
-                        game.setGameState(GAME_STATE::MENU);
-                    }
-                    
-                }  
-                if (game.getGameState() == GAME_STATE::PAUSE)
-                {
-                    if (e.key.code == Keyboard::Escape)
-                    {
-                        game.setGameState(GAME_STATE::MENU);
-                    }
                 }
             }
         }
@@ -131,29 +125,38 @@ int main()
             }
             else
             {
-                menu.events(window);
+                if (!block_input)
+                {
+                    menu.events(window);
 
-                switch (menu.getState())
+                    switch (menu.getState())
+                    {
+                    case MENU_STATE::GAME:
+                    {
+                        game.setGameState(GAME_STATE::PLAY);
+                        menu.setState(MENU_STATE::NONE);
+                        break;
+                    }
+
+                    case MENU_STATE::CLOSE:
+                    {
+                        window.close();
+                        break;
+                    }
+
+                    case MENU_STATE::NONE:
+                    {
+
+                    }
+
+                    }
+                    block_input = true;
+                }
+                else
                 {
-                case MENU_STATE::GAME:
-                {
-                    game.setGameState(GAME_STATE::PLAY);
-                    menu.setState(MENU_STATE::NONE);
-                    break;
+                    block_input = false;
                 }
 
-                case MENU_STATE::CLOSE:
-                {
-                    window.close();
-                    break;
-                }
-
-                case MENU_STATE::NONE:
-                {
-
-                }
-
-                }
             }
         }
         else if (game.getGameState() == GAME_STATE::PLAY) {
@@ -165,9 +168,12 @@ int main()
         }
         else if (game.getGameState() == GAME_STATE::RESULT) {
             game_menu.draw(window);
-            switch (game_menu.events(window))
+
+            if (!block_input)
             {
-                
+                switch (game_menu.events(window))
+                {
+
                 case COMMAND::BACK:
                 {
                     if (!game.isGameOver())
@@ -198,7 +204,14 @@ int main()
 
                 }
 
+                }
+                block_input = true;
             }
+            else
+            {
+                block_input = false;
+            }
+           
         }
         window.display();
     }

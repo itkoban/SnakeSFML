@@ -1,8 +1,4 @@
 #include "Game.h"
-#include <Math.h>
-#include <iostream>
-#include <sstream>
-#include "GameMap.h"
 
 /*
 -----------------

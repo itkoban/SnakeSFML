@@ -1,7 +1,10 @@
 #include "GameMenu.h"
 
-#include <SFML/Graphics.hpp>
-#include <iostream>
+/*
+-----------------
+PRIVATE Functions
+-----------------
+*/
 
 bool GameMenu::containsSprite(sf::Sprite sprite, int x, int y) {
 
@@ -17,14 +20,46 @@ bool GameMenu::containsSprite(sf::Sprite sprite, int x, int y) {
 	return false;
 }
 
-
-
-GameMenu::GameMenu(sf::RenderWindow& window)
+void GameMenu::drawStars(sf::RenderWindow& window)
 {
+	int score = game_obj->getScore();
+	if (score < 100 && score > 0)
+	{
+		leftStar.setTexture(leftStarActive);
+	}
+	else if (score < 150 && score >= 100)
+	{
+		leftStar.setTexture(leftStarActive);
+		centerStar.setTexture(centerStarActive);
+	}
+	else if(score >= 150)
+	{
+		leftStar.setTexture(leftStarActive);
+		centerStar.setTexture(centerStarActive);
+		rightStar.setTexture(rightStarActive);
+	}
+
+	window.draw(leftStar);
+	window.draw(centerStar);
+	window.draw(rightStar);
+}
+
+/*
+----------------
+PUBLIC Functions
+----------------
+*/
+
+GameMenu::GameMenu(sf::RenderWindow& window, Game* game_link)
+{
+	game_obj = game_link;
+
 	scale_x = window.getSize().x / 1920.0f;
 	scale_y = window.getSize().y / 1080.0f;
 
 	menuNum = 0;
+
+	font.loadFromFile("Calibri.ttf");
 
 	backTexture.loadFromFile("images/GameMenu/back.png");
 	backSprite.setTexture(backTexture);
@@ -51,16 +86,43 @@ GameMenu::GameMenu(sf::RenderWindow& window)
 	closeButton.setScale(scale_x, scale_y);
 	closeButton.setPosition(window.getSize().x / 2 + 1.2 * scale_x * closeTexturePassive.getSize().x / 2, window.getSize().y / 2 + window.getSize().y / 4 - 1.2 * scale_y * closeTexturePassive.getSize().y / 2);
 	
+	leftStarPassive.loadFromFile("images/HUD/star_left_off.png");
+	leftStarActive.loadFromFile("images/HUD/star_left_on.png");
+	leftStar.setTexture(leftStarPassive);
+	leftStar.setScale(scale_x, scale_y);
+	leftStar.setPosition(window.getSize().x / 2 - 200.0 * scale_x, window.getSize().y / 5);
+
+
+	centerStarPassive.loadFromFile("images/HUD/star_center_off.png");
+	centerStarActive.loadFromFile("images/HUD/star_center_on.png");
+	centerStar.setTexture(centerStarPassive);
+	centerStar.setScale(scale_x, scale_y);
+	centerStar.setPosition(window.getSize().x / 2 - scale_x * centerStarPassive.getSize().x / 2, window.getSize().y / 5);
+
+	rightStarPassive.loadFromFile("images/HUD/star_right_off.png");
+	rightStarActive.loadFromFile("images/HUD/star_right_on.png");
+	rightStar.setTexture(rightStarPassive);
+	rightStar.setScale(scale_x, scale_y);
+	rightStar.setPosition(window.getSize().x / 2 + 100.0 * scale_x, window.getSize().y / 5);
+
 }
 
 void GameMenu::draw(sf::RenderWindow& window) {
 
-	window.clear(sf::Color::White);
+	std::ostringstream score;
+	score << game_obj->getScore();
+
+	std::string text("Score\t\t\t\t\t\t\t\t" + score.str());
+	Text score_text("", font, 40);
+	score_text.setString(text);
+	score_text.setPosition(window.getSize().x / 2 - 1.8 * scale_x * returnTexturePassive.getSize().x, window.getSize().y / 3 * 1.0f);
+	
 	window.draw(backSprite);
 	window.draw(returnButton);
 	window.draw(retryButton);
 	window.draw(closeButton);
-
+	window.draw(score_text);
+	drawStars(window);
 }
 
 //—‰ÂÎ‡Ú¸ ÍÎ‡ÒÒ  ÕŒœ »
