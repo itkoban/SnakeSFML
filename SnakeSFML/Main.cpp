@@ -15,7 +15,7 @@ int main()
 {
     srand(time(0));
 
-    RenderWindow window(VideoMode::getDesktopMode(), "Snake Game!", sf::Style::Fullscreen);
+    RenderWindow window(VideoMode::getDesktopMode(), "Snake Game!"/*, sf::Style::Fullscreen*/);
 
     window.setFramerateLimit(60);
 

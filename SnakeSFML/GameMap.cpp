@@ -425,4 +425,6 @@ void GameMap::restart(Dictionary* dictionary, Snake* snake)
 	{
 		std::cout << letters.at(i).getType() << std::endl;
 	}
+
+	
 }
